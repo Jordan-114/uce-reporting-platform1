@@ -1,0 +1,31 @@
+# =========================
+# TERRAFORM
+# =========================
+
+# Directorios internos
+.terraform/
+.terraform.lock.hcl
+
+# Archivos de estado
+*.tfstate
+*.tfstate.*
+
+# Planes
+*.tfplan
+
+# Variables sensibles
+*.tfvars
+*.tfvars.json
+
+# Overrides
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Logs
+crash.log
+
+# Archivos locales
+terraform.rc
+.terraformrc

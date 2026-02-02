@@ -1,0 +1,65 @@
+# =========================
+# SISTEMA
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# PYTHON
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.log
+*.sqlite3
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+
+# Pytest / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# =========================
+# NODE / FRONTEND
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+build/
+
+# =========================
+# DOCKER
+# =========================
+*.tar
+docker-compose.override.yml
+
+# =========================
+# VARIABLES DE ENTORNO
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# IDEs / EDITORES
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# LOGS
+# =========================
+logs/
+*.log
+
+UsuarioService/usuario-env/
+

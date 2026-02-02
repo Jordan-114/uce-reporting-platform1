@@ -1,0 +1,102 @@
+version: "3.9"
+
+services:
+
+  usuarioservice:
+    build: ./UsuarioService
+    container_name: usuarioservice
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    volumes:
+      - ./UsuarioService/.env:/app/.env
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:ALEXA1209@postgres:5432/quejas_db
+    networks:
+      - polling_net
+
+  quejasoficinaservice:
+    build: ./QuejasOficinaService
+    container_name: quejasoficinaservice
+    ports:
+      - "8002:8000"
+    depends_on:
+      - postgres
+    environment:
+      - DATABASE_URL=postgresql://postgres:ALEXA1209@postgres:5432/quejas_db
+    volumes:
+      - ./QuejasOficinaService/.env:/app/.env
+    networks:
+      - polling_net
+
+  quejaswebservice:
+    build: ./QuejasWebService
+    container_name: quejaswebservice
+    ports:
+      - "8001:8000"
+    depends_on:
+      - mongo_web
+    environment:
+      - MONGO_URL=mongodb://mongo_web:27017/quejas_db?replicaSet=rs0
+    networks:
+      - polling_net
+
+  reporteservice:
+    build: ./ReporteService
+    container_name: reporteservice
+    ports:
+      - "8003:8000"
+    volumes:
+      - ./ReporteService/.env:/app/.env
+    depends_on:
+      - usuarioservice
+      - quejaswebservice
+      - quejasoficinaservice
+    networks:
+      - polling_net
+
+  frontend:
+    build: ./Frontend
+    container_name: frontend
+    ports:
+      - "7000:80"
+    networks:
+      - polling_net
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ALEXA1209
+      POSTGRES_DB: quejas_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init/init-pg.sql:/docker-entrypoint-initdb.d/init-pg.sql
+    networks:
+      - polling_net
+
+  mongo_web:
+    image: mongo:6
+    container_name: mongo_web
+    ports:
+      - "27018:27017"
+    volumes:
+      - ./init/mongo_dump:/dump:ro
+    command: >
+      sh -c "
+        mongod --bind_ip_all --replSet rs0 &
+        sleep 12 &&
+        mongosh --eval 'try { rs.initiate() } catch(e) { print(\"Replica set ya iniciado\") }' &&
+        sleep 10 &&
+        mongorestore --db quejas_db --drop /dump/quejas_db || true &&
+        tail -f /dev/null
+      "
+    networks:
+      - polling_net
+
+networks:
+  polling_net:
+    driver: bridge
